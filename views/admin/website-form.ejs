@@ -1,0 +1,216 @@
+<h1 class="mt-4"><%= action === 'create' ? '添加网站' : '编辑网站' %></h1>
+
+<ol class="breadcrumb mb-4">
+  <li class="breadcrumb-item"><a href="/admin/dashboard">控制台</a></li>
+  <li class="breadcrumb-item"><a href="/admin/websites">网站管理</a></li>
+  <li class="breadcrumb-item active"><%= action === 'create' ? '添加网站' : '编辑网站' %></li>
+</ol>
+
+<% if (typeof error !== 'undefined' && error) { %>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <%= error %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <i class="bi bi-file-earmark-text me-1"></i>
+        <%= action === 'create' ? '添加新网站' : '编辑网站信息' %>
+      </div>
+      <div>
+        <a href="/admin/websites" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left"></i> 返回网站列表
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form method="POST" 
+          action="<%= action === 'create' ? '/admin/websites/create' : `/admin/websites/update/${website.id}` %>"
+          enctype="multipart/form-data">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="title" class="form-label">网站名称 *</label>
+            <input type="text" class="form-control" id="title" name="title" 
+                   value="<%= website ? website.title : '' %>" required>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="url" class="form-label">网站链接 *</label>
+            <input type="url" class="form-control" id="url" name="url" 
+                   value="<%= website ? website.url : '' %>" required>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-3">
+        <label for="description" class="form-label">描述 *</label>
+        <textarea class="form-control" id="description" name="description" rows="4" required><%= website ? website.description : '' %></textarea>
+      </div>
+      
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="category_id" class="form-label">分类</label>
+            <select class="form-select" id="category_id" name="category_id">
+              <option value="">-- 选择分类 --</option>
+              <% if (categories && categories.length > 0) { %>
+                <% categories.forEach(category => { %>
+                  <option value="<%= category.id %>" 
+                    <%= (website && website.category_id == category.id) ? 'selected' : '' %>>
+                    <%= category.name %>
+                  </option>
+                <% }) %>
+              <% } %>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <!-- 图片上传/URL切换 -->
+          <div class="mb-3">
+            <label class="form-label">网站图片</label>
+            
+            <div class="mb-3">
+              <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="imgSourceOption" id="uploadOption" value="upload" <%= (website && website.image_url && website.image_url.startsWith('http')) ? '' : 'checked' %>>
+                <label class="btn btn-outline-secondary" for="uploadOption">上传图片</label>
+
+                <input type="radio" class="btn-check" name="imgSourceOption" id="urlOption" value="url" <%= (website && website.image_url && website.image_url.startsWith('http')) ? 'checked' : '' %>>
+                <label class="btn btn-outline-secondary" for="urlOption">使用网络图片</label>
+              </div>
+            </div>
+            
+            <!-- 本地上传选项 -->
+            <div id="uploadSection" class="mb-3" <%= (website && website.image_url && website.image_url.startsWith('http')) ? 'style="display:none;"' : '' %>>
+              <input type="file" class="form-control" id="image" name="image" accept="image/*">
+              <% if (website && website.image_url && !website.image_url.startsWith('http')) { %>
+                <div class="mt-2">
+                  <img src="<%= website.image_url %>" alt="当前图片" class="img-thumbnail" width="100">
+                  <p class="small">已有图片，上传新图片将替换此图</p>
+                  <input type="hidden" name="current_image" value="<%= website.image_url %>">
+                </div>
+              <% } %>
+              <small class="text-muted">支持格式: jpg, jpeg, png, gif, webp (最大5MB)</small>
+            </div>
+            
+            <!-- URL链接选项 -->
+            <div id="urlSection" class="mb-3" <%= (website && website.image_url && website.image_url.startsWith('http')) ? '' : 'style="display:none;"' %>>
+              <input type="text" class="form-control" id="image_url" name="image_url" 
+                     placeholder="输入网络图片URL" value="<%= website && website.image_url && website.image_url.startsWith('http') ? website.image_url : '' %>">
+              <small class="text-muted">请输入完整的图片URL，包含http://或https://</small>
+              
+              <div class="mt-2">
+                <button type="button" class="btn btn-sm btn-outline-info" id="previewUrlBtn">预览图片</button>
+                <div id="imagePreview" class="mt-2" <%= (website && website.image_url && website.image_url.startsWith('http')) ? '' : 'style="display:none;"' %>>
+                  <img src="<%= website && website.image_url && website.image_url.startsWith('http') ? website.image_url : '' %>" alt="URL预览" class="img-thumbnail" width="100">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mb-3 form-check">
+        <input type="checkbox" class="form-check-input" id="featured" name="featured"
+               <%= (website && website.featured) ? 'checked' : '' %>>
+        <label class="form-check-label" for="featured">设为推荐网站</label>
+      </div>
+      
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">
+          <%= action === 'create' ? '添加网站' : '更新网站' %>
+        </button>
+        <a href="/admin/websites" class="btn btn-secondary">取消</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 处理图片来源选项切换
+    const uploadOption = document.getElementById('uploadOption');
+    const urlOption = document.getElementById('urlOption');
+    const uploadSection = document.getElementById('uploadSection');
+    const urlSection = document.getElementById('urlSection');
+    
+    // 切换处理
+    uploadOption.addEventListener('change', function() {
+      if (this.checked) {
+        uploadSection.style.display = 'block';
+        urlSection.style.display = 'none';
+      }
+    });
+    
+    urlOption.addEventListener('change', function() {
+      if (this.checked) {
+        uploadSection.style.display = 'none';
+        urlSection.style.display = 'block';
+      }
+    });
+    
+    // 预览URL图片
+    const previewUrlBtn = document.getElementById('previewUrlBtn');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImage = imagePreview.querySelector('img');
+    
+    previewUrlBtn.addEventListener('click', function() {
+      const imageUrl = document.getElementById('image_url').value.trim();
+      
+      if (imageUrl) {
+        previewImage.src = imageUrl;
+        previewImage.onload = function() {
+          imagePreview.style.display = 'block';
+        };
+        previewImage.onerror = function() {
+          imagePreview.style.display = 'none';
+          alert('图片链接无效或无法访问，请检查URL');
+        };
+      } else {
+        alert('请输入图片URL');
+      }
+    });
+    
+    // 预览本地图片上传
+    document.getElementById('image').addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          let previewContainer = uploadSection.querySelector('.mt-2');
+          
+          if (previewContainer) {
+            // 更新已存在的预览
+            previewContainer.querySelector('img').src = e.target.result;
+          } else {
+            // 创建新的预览
+            previewContainer = document.createElement('div');
+            previewContainer.className = 'mt-2';
+            previewContainer.innerHTML = `
+              <img src="${e.target.result}" alt="预览图片" class="img-thumbnail" width="100">
+              <p class="small">图片预览</p>
+            `;
+            uploadSection.appendChild(previewContainer);
+          }
+        }
+        
+        reader.readAsDataURL(this.files[0]);
+      }
+    });
+    
+    // 自动设置日期时间
+    const now = new Date('2025-03-08T01:32:18Z');
+    const formattedDate = now.toLocaleDateString('zh-CN') + ' ' + now.toLocaleTimeString('zh-CN');
+    const dateElements = document.querySelectorAll('.current-datetime');
+    if (dateElements.length > 0) {
+      dateElements.forEach(el => {
+        el.textContent = formattedDate;
+      });
+    }
+  });
+</script>

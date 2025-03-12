@@ -1,0 +1,78 @@
+<h1 class="mt-4"><%= action === 'create' ? '添加分类' : '编辑分类' %></h1>
+
+<ol class="breadcrumb mb-4">
+  <li class="breadcrumb-item"><a href="/admin/dashboard">控制台</a></li>
+  <li class="breadcrumb-item"><a href="/admin/categories">分类管理</a></li>
+  <li class="breadcrumb-item active"><%= action === 'create' ? '添加分类' : '编辑分类' %></li>
+</ol>
+
+<div class="card mb-4">
+  <div class="card-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <i class="bi bi-file-earmark-text me-1"></i>
+        <%= action === 'create' ? '添加新分类' : '编辑分类信息' %>
+      </div>
+      <div>
+        <a href="/admin/categories" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left"></i> 返回分类列表
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="card-body">
+    <form method="POST" 
+          action="<%= action === 'create' ? '/admin/categories/create' : `/admin/categories/update/${category.id}` %>">
+      <div class="mb-3">
+        <label for="name" class="form-label">分类名称 *</label>
+        <input type="text" class="form-control" id="name" name="name" 
+               value="<%= category ? category.name : '' %>" required>
+      </div>
+      
+      <div class="mb-3">
+        <label for="description" class="form-label">描述</label>
+        <textarea class="form-control" id="description" name="description" rows="3"><%= category ? category.description : '' %></textarea>
+      </div>
+      
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="icon" class="form-label">图标类名</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi <%= category ? category.icon || 'bi-grid' : 'bi-grid' %>"></i></span>
+              <input type="text" class="form-control" id="icon" name="icon" 
+                     value="<%= category ? category.icon : 'bi-grid' %>"
+                     placeholder="例如: bi-chat-dots">
+            </div>
+            <small class="text-muted">使用Bootstrap Icons类名，参考：<a href="https://icons.getbootstrap.com/" target="_blank">Bootstrap Icons</a></small>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="order_index" class="form-label">排序索引</label>
+            <input type="number" class="form-control" id="order_index" name="order_index" 
+                   value="<%= category ? category.order_index : 0 %>" min="0">
+            <small class="text-muted">数字越小排序越靠前</small>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-4">
+        <button type="submit" class="btn btn-primary">
+          <%= action === 'create' ? '添加分类' : '更新分类' %>
+        </button>
+        <a href="/admin/categories" class="btn btn-secondary">取消</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 图标预览
+    document.getElementById('icon').addEventListener('input', function() {
+      const iconPreview = this.previousElementSibling.querySelector('i');
+      iconPreview.className = 'bi ' + this.value;
+    });
+  });
+</script>

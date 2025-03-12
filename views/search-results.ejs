@@ -1,0 +1,52 @@
+
+  <div class="container-fluid px-4">
+    <h1 class="h3 mb-4 text-gray-800">
+      搜索结果: "<%= searchTerm %>"
+      <span class="text-muted">(<%= websites.length %>)</span>
+    </h1>
+
+    <div class="mb-4">
+      <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> 返回
+      </a>
+    </div>
+
+    <!-- 搜索结果列表 -->
+    <% if (websites && websites.length > 0) { %>
+      <div class="row">
+        <% websites.forEach(website => { %>
+          <div class="col-md-4 col-xl-3 col-sm-6 mb-4">
+            <div class="card h-100 website-card">
+              <div class="card-body">
+                <h3 class="card-title h5">
+                  <a href="/website/<%= website.id %>"><%= website.title %></a>
+                  <% if (website.featured) { %>
+                    <i class="bi bi-star-fill text-warning ms-1" title="推荐网站"></i>
+                  <% } %>
+                </h3>
+                <% if (website.image_url) { %>
+                  <div class="website-image mb-2">
+                    <img src="<%= website.image_url %>" alt="<%= website.title %>" class="img-fluid rounded">
+                  </div>
+                <% } %>
+                <p class="card-text description">
+                  <%= website.description.length > 100 ? website.description.substring(0, 100) + '...' : website.description %>
+                </p>
+                <p class="card-text"><small class="text-muted">分类: <%= website.category_name || '未分类' %></small></p>
+              </div>
+              <div class="card-footer bg-transparent border-0 text-end">
+                <a href="/website/<%= website.id %>" class="btn btn-sm btn-outline-secondary">查看详情</a>
+                <a href="<%= website.url %>" class="btn btn-sm btn-primary" target="_blank">
+                  <i class="bi bi-box-arrow-up-right"></i> 访问
+                </a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } else { %>
+      <div class="alert alert-info">
+        <i class="bi bi-search"></i> 没有找到与 "<%= searchTerm %>" 相关的网站。
+      </div>
+    <% } %>
+  </div>

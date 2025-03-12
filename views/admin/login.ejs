@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-login-bg">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-5 col-md-7">
+        <div class="card shadow-lg o-hidden border-0 my-5">
+          <div class="card-body p-0">
+            <div class="p-5">
+              <div class="text-center mb-4">
+                <h1 class="h4 text-gray-900">AI 网站收集管理系统</h1>
+                <p class="text-muted">请登录继续</p>
+              </div>
+              
+              <% if (error) { %>
+                <div class="alert alert-danger">
+                  <%= error %>
+                </div>
+              <% } %>
+              
+              <form class="user" method="POST" action="/admin/login">
+                <div class="mb-3">
+                  <label for="username" class="form-label">用户名</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" class="form-control" id="username" name="username" 
+                          placeholder="输入用户名" value="clen1" required>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  <label for="password" class="form-label">密码</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" class="form-control" id="password" name="password" 
+                          placeholder="输入密码" required>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">
+                  登录
+                </button>
+              </form>
+              
+              <hr>
+              
+              <div class="text-center">
+                <a class="small" href="/">返回前台站点</a>
+              </div>
+              
+              <div class="text-center mt-3">
+                <small class="text-muted">
+                  系统时间: 2025-03-07 07:03:00
+                </small>
+              </div>
+
+              <div class="text-center mt-2">
+                <small class="text-muted">
+                  版本: 1.0.0 | &copy; 2025 AI网站收集
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // 更新系统时间
+    function updateSystemTime() {
+      const timeElement = document.querySelector('.text-muted');
+      if (timeElement) {
+        // 获取当前时间并格式化为 YYYY-MM-DD HH:MM:SS
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        
+        const formattedTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+        
+        // 更新显示的时间
+        timeElement.textContent = `系统时间: ${formattedTime}`;
+      }
+    }
+    
+    // 页面加载时初始化时间并定时更新
+    document.addEventListener('DOMContentLoaded', function() {
+      // 初始设置时间
+      updateSystemTime();
+      
+      // 每秒更新时间
+      setInterval(updateSystemTime, 1000);
+      
+      // 添加表单提交事件
+      document.querySelector('form.user').addEventListener('submit', function(event) {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        
+        if (!username || !password) {
+          event.preventDefault();
+          alert('请输入用户名和密码');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

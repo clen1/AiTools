@@ -1,0 +1,96 @@
+<h1 class="mt-4">控制台</h1>
+<ol class="breadcrumb mb-4">
+  <li class="breadcrumb-item active">控制台</li>
+</ol>
+
+<!-- 统计卡片 -->
+<div class="row">
+  <div class="col-xl-3 col-md-6">
+    <div class="card bg-primary text-white mb-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div>
+            <div class="text-xs text-white-50">网站总数</div>
+            <div class="display-6"><%= stats.websites %></div>
+          </div>
+          <div class="ms-auto">
+            <i class="bi bi-globe display-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer d-flex align-items-center justify-content-between">
+        <a class="small text-white stretched-link" href="/admin/websites">查看详情</a>
+        <div class="small text-white"><i class="bi bi-arrow-right"></i></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xl-3 col-md-6">
+    <div class="card bg-warning text-white mb-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div>
+            <div class="text-xs text-white-50">分类总数</div>
+            <div class="display-6"><%= stats.categories %></div>
+          </div>
+          <div class="ms-auto">
+            <i class="bi bi-tags display-1 opacity-50"></i>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer d-flex align-items-center justify-content-between">
+        <a class="small text-white stretched-link" href="/admin/categories">查看详情</a>
+        <div class="small text-white"><i class="bi bi-arrow-right"></i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 欢迎卡片 -->
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="card-title">欢迎回来，<strong><%= admin %></strong>！</h5>
+    <p class="card-text">今天是 <%= new Date().toLocaleDateString('zh-CN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>，祝您工作顺利！</p>
+    <p class="text-muted mb-0">最近登录时间：<%= currentDateTime %></p>
+  </div>
+</div>
+
+<!-- 访问最多的网站表格 -->
+<div class="card mb-4">
+  <div class="card-header">
+    <i class="bi bi-table me-1"></i>
+    访问量最高的网站
+  </div>
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>网站名称</th>
+            <th>分类</th>
+            <th>访问次数</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (popularWebsites && popularWebsites.length > 0) { %>
+            <% popularWebsites.forEach(website => { %>
+              <tr>
+                <td><%= website.title %></td>
+                <td><%= website.category_name || '未分类' %></td>
+                <td><%= website.visit_count %></td>
+                <td>
+                  <a href="/admin/websites/edit/<%= website.id %>" class="btn btn-sm btn-primary">编辑</a>
+                  <a href="/website/<%= website.id %>" target="_blank" class="btn btn-sm btn-info">查看</a>
+                </td>
+              </tr>
+            <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="4" class="text-center">暂无数据</td>
+            </tr>
+          <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

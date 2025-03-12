@@ -1,0 +1,102 @@
+<div class="container-fluid px-4">
+    <!-- 返回按钮 -->
+    <div class="mb-4">
+      <a href="javascript:history.back()" class="btn btn-sm btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> 返回
+      </a>
+    </div>
+    
+    <div class="card website-detail-card mb-4">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-lg-8">
+            <h1 class="h2 mb-3"><%= website.title %></h1>
+            
+            <div class="mb-4">
+              <span class="badge bg-secondary me-2"><%= website.category_name || '未分类' %></span>
+              <% if (website.featured) { %>
+                <span class="badge bg-warning">推荐网站</span>
+              <% } %>
+            </div>
+            
+            <div class="website-description mb-4">
+              <h2 class="h5">网站介绍</h2>
+              <p><%= website.description %></p>
+            </div>
+            
+            <div class="mb-4">
+              <a href="<%= website.url %>" class="btn btn-primary" target="_blank">
+                <i class="bi bi-box-arrow-up-right"></i> 访问网站
+              </a>
+              <div class="text-muted mt-2">
+                <small>已有 <%= website.visit_count %> 人访问</small>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-4">
+            <% if (website.image_url) { %>
+              <div class="website-image text-center mb-4">
+                <img src="<%= website.image_url %>" alt="<%= website.title %>" class="img-fluid rounded shadow">
+              </div>
+            <% } else { %>
+              <div class="website-no-image bg-light rounded text-center p-5 mb-4">暂无图片</div>
+            <% } %>
+            
+            <div class="card bg-light mb-3">
+              <div class="card-header"><i class="bi bi-info-circle"></i> 网站信息</div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>分类:</span>
+                  <span><%= website.category_name || '未分类' %></span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>是否推荐:</span>
+                  <span>
+                    <% if (website.featured) { %>
+                      <i class="bi bi-check-lg text-success"></i> 是
+                    <% } else { %>
+                      <i class="bi bi-x-lg text-muted"></i> 否
+                    <% } %>
+                  </span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between">
+                  <span>添加时间:</span>
+                  <span><%= new Date(website.created_at).toLocaleDateString() %></span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- 相关网站 -->
+    <% if (relatedWebsites && relatedWebsites.length > 0) { %>
+      <section class="related-websites mb-4">
+        <h2 class="h4 mb-3"><i class="bi bi-link-45deg"></i> 相关AI网站</h2>
+        <div class="row">
+          <% relatedWebsites.forEach(related => { %>
+            <div class="col-md-3 col-sm-6 mb-3">
+              <div class="card h-100 website-card">
+                <div class="card-body">
+                  <h3 class="card-title h5">
+                    <a href="/website/<%= related.id %>"><%= related.title %></a>
+                  </h3>
+                  <% if (related.image_url) { %>
+                    <div class="website-image mb-2">
+                      <img src="<%= related.image_url %>" alt="<%= related.title %>" class="img-fluid rounded">
+                    </div>
+                  <% } %>
+                  <p class="card-text description"><%= related.description.length > 60 ? related.description.substring(0, 60) + '...' : related.description %></p>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-end">
+                  <a href="/website/<%= related.id %>" class="btn btn-sm btn-outline-secondary">查看详情</a>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </section>
+    <% } %>
+  </div>

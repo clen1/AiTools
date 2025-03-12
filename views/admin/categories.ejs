@@ -1,0 +1,139 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mt-4">分类管理</h1>
+    <a href="/admin/categories/new" class="btn btn-primary">
+      <i class="bi bi-plus-lg"></i> 添加分类
+    </a>
+  </div>
+  
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin/dashboard">控制台</a></li>
+    <li class="breadcrumb-item active">分类管理</li>
+  </ol>
+  
+  <% if (message) { %>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <%= message %>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  <% } %>
+  
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="bi bi-table me-1"></i>
+      分类列表
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th width="5%">ID</th>
+              <th width="20%">分类名称</th>
+              <th width="25%">描述</th>
+              <th width="15%">图标</th>
+              <th width="15%">排序</th>
+              <th width="20%">操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (categories && categories.length > 0) { %>
+              <% categories.forEach(category => { %>
+                <tr>
+                  <td><%= category.id %></td>
+                  <td><%= category.name %></td>
+                  <td><%= category.description ? (category.description.length > 50 ? category.description.substring(0, 50) + '...' : category.description) : '' %></td>
+                  <td>
+                    <i class="bi <%= category.icon || 'bi-grid' %>"></i> 
+                    <%= category.icon || 'bi-grid' %>
+                  </td>
+                  <td><%= category.order_index %></td>
+                  <td>
+                    <a href="/admin/categories/edit/<%= category.id %>" class="btn btn-sm btn-primary">编辑</a>
+                    <button class="btn btn-sm btn-danger delete-category" data-id="<%= category.id %>">删除</button>
+                  </td>
+                </tr>
+              <% }) %>
+            <% } else { %>
+              <tr>
+                <td colspan="6" class="text-center">暂无分类数据</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 删除确认模态框 -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">确认删除</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>确定要删除这个分类吗？此操作不可逆。</p>
+          <p class="text-danger">注意：删除分类将导致该分类下的所有网站变为"未分类"状态。</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 分类删除功能
+      let categoryToDelete = null;
+      const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+      
+      document.querySelectorAll('.delete-category').forEach(btn => {
+        btn.addEventListener('click', function() {
+          categoryToDelete = this.getAttribute('data-id');
+          deleteModal.show();
+        });
+      });
+      
+      document.getElementById('confirmDelete').addEventListener('click', function() {
+        if (!categoryToDelete) return;
+        
+        fetch(`/admin/categories/delete/${categoryToDelete}`, {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            deleteModal.hide();
+            window.location.reload();
+          } else {
+            alert(`删除失败: ${data.message}`);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('删除过程中发生错误');
+        });
+      });
+  
+      // 显示当前时间和用户
+      const updateDateTime = () => {
+        fetch('/admin/info')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              const datetimeElements = document.querySelectorAll('.current-datetime');
+              datetimeElements.forEach(el => {
+                el.textContent = data.currentDateTime;
+              });
+            }
+          })
+          .catch(error => console.error('Error fetching datetime:', error));
+      };
+      
+      // 每分钟更新一次
+      setInterval(updateDateTime, 60000);
+    });
+  </script>
